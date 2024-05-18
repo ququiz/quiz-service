@@ -9,18 +9,21 @@ import {
   BaseQuiz,
   BaseQuizStatus,
 } from 'src/modules/datasources/entities/base-quiz.entity';
-import { randomUUID } from 'crypto';
 import {
   Question,
   QuestionType,
 } from 'src/modules/datasources/entities/questions.entity';
 import { Choice } from 'src/modules/datasources/entities/choices.entity';
+import { JwtPayloadDTO } from 'src/modules/commons/auth/dtos/auth.dto';
 
 @Injectable()
 export class QuizService {
   constructor(private readonly baseQuizRepository: BaseQuizRepository) {}
 
-  public async createQuiz(payload: CreateQuizReqBodyDTO): Promise<string> {
+  public async createQuiz(
+    payload: CreateQuizReqBodyDTO,
+    jwt: JwtPayloadDTO,
+  ): Promise<string> {
     const baseQuiz = new BaseQuiz();
 
     if (payload.start_time > payload.end_time)
@@ -35,7 +38,7 @@ export class QuizService {
       baseQuiz.status = BaseQuizStatus.InProgress;
 
     baseQuiz.passcode = Math.random().toString(36).substring(7);
-    baseQuiz.creator_id = randomUUID(); // mock implementation
+    baseQuiz.creator_id = jwt.sub;
     baseQuiz.questions = payload.questions.map((question) =>
       this.mapCreateQuestionDTOToQuestion(question),
     );
