@@ -18,10 +18,14 @@ import { SuccessResponse } from 'src/helpers/interfaces';
 import { JwtGuard } from 'src/modules/commons/auth/guards/jwt.guard';
 import { JWT } from 'src/modules/commons/auth/decorators/jwt.decorator';
 import { JwtPayloadDTO } from 'src/modules/commons/auth/dtos/auth.dto';
+import { CronService } from '../cron/cron.service';
 
 @Controller('quiz')
 export class QuizController {
-  constructor(private readonly quizService: QuizService) {}
+  constructor(
+    private readonly quizService: QuizService,
+    private readonly cronService: CronService,
+  ) {}
 
   @Post()
   @UseGuards(JwtGuard)
@@ -30,6 +34,15 @@ export class QuizController {
     @JWT() jwt: JwtPayloadDTO,
   ): Promise<SuccessResponse<CreateQuizResDTO>> {
     const quizId = await this.quizService.createQuiz(body, jwt);
+
+    //start quiz cron job
+    await this.cronService.createStartJob(
+      quizId,
+      body.start_time.toISOString(),
+    );
+
+    //end quiz cron job
+    await this.cronService.createEndJob(quizId, body.end_time.toISOString());
 
     return {
       message: 'Quiz created successfully',
@@ -50,6 +63,21 @@ export class QuizController {
     @Param('quizId') quizId: string,
   ): Promise<SuccessResponse<string>> {
     await this.quizService.updateQuiz(quizId, body, jwt);
+
+    //check if start_time is updated
+    if (body.start_time) {
+      //update cron job
+      await this.cronService.createStartJob(
+        quizId,
+        body.start_time.toISOString(),
+      );
+    }
+
+    //check if end_time is updated
+    if (body.end_time) {
+      //update cron job
+      await this.cronService.createEndJob(quizId, body.end_time.toISOString());
+    }
 
     return {
       message: 'Quiz updated successfully',
@@ -79,6 +107,9 @@ export class QuizController {
     @JWT() jwt: JwtPayloadDTO,
   ): Promise<SuccessResponse<string>> {
     await this.quizService.deleteQuiz(quizId, jwt);
+
+    //delete cron jobs
+    await this.cronService.deleteJob(quizId);
 
     return {
       message: 'Quiz deleted successfully',
