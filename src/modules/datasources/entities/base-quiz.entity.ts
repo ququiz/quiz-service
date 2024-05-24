@@ -28,10 +28,10 @@ export class BaseQuiz {
   @Column()
   end_time: Date;
 
-  @Column((type) => Question)
+  @Column(() => Question)
   questions: Question[];
 
-  @Column((type) => Participant)
+  @Column(() => Participant)
   participants: Participant[];
 
   @Column()

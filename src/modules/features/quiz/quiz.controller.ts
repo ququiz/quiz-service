@@ -1,6 +1,19 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { QuizService } from './quiz.service';
-import { CreateQuizReqBodyDTO, CreateQuizResDTO } from './dtos/create-quiz.dto';
+import {
+  AddQuizParticipantResDTO,
+  CreateQuizReqBodyDTO,
+  CreateQuizResDTO,
+  UpdateQuizDTO,
+} from './dtos/create-quiz.dto';
 import { SuccessResponse } from 'src/helpers/interfaces';
 import { JwtGuard } from 'src/modules/commons/auth/guards/jwt.guard';
 import { JWT } from 'src/modules/commons/auth/decorators/jwt.decorator';
@@ -25,6 +38,50 @@ export class QuizController {
           id: quizId,
         },
       },
+    };
+  }
+
+  //update quiz method endpoint
+  @Put(':quizId')
+  @UseGuards(JwtGuard)
+  public async postUpdateQuiz(
+    @Body() body: UpdateQuizDTO,
+    @JWT() jwt: JwtPayloadDTO,
+    @Param('quizId') quizId: string,
+  ): Promise<SuccessResponse<string>> {
+    await this.quizService.updateQuiz(quizId, body, jwt);
+
+    return {
+      message: 'Quiz updated successfully',
+    };
+  }
+
+  //add quiz participant endpoint
+  @Post(':quizId/participant')
+  @UseGuards(JwtGuard)
+  public async postAddQuizParticipant(
+    @Body() body: { participant_id: string },
+    @JWT() jwt: JwtPayloadDTO,
+    @Param('quizId') quizId: string,
+  ): Promise<SuccessResponse<AddQuizParticipantResDTO>> {
+    await this.quizService.addQuizParticipant(body, jwt, quizId);
+
+    return {
+      message: 'Participant added successfully',
+    };
+  }
+
+  //delete quiz method endpoint
+  @Delete(':quizId')
+  @UseGuards(JwtGuard)
+  public async postDeleteQuiz(
+    @Param('quizId') quizId: string,
+    @JWT() jwt: JwtPayloadDTO,
+  ): Promise<SuccessResponse<string>> {
+    await this.quizService.deleteQuiz(quizId, jwt);
+
+    return {
+      message: 'Quiz deleted successfully',
     };
   }
 }

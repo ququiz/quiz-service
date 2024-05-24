@@ -60,8 +60,39 @@ export class CreateQuizQuestionChoiceDTO {
   is_correct?: boolean;
 }
 
+export class UpdateQuizDTO {
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsArray()
+  @Type(() => CreateQuizQuestionDTO)
+  @ValidateNested({ each: true })
+  questions?: CreateQuizQuestionDTO[];
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  start_time?: Date;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  end_time?: Date;
+}
+
+export class AddQuizParticipantDTO {
+  @IsString()
+  participant_id: string;
+}
+
 export class CreateQuizResDTO {
   created_quiz: {
     id: string;
   };
+}
+
+export class AddQuizParticipantResDTO {
+  message: string;
 }
