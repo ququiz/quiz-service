@@ -22,10 +22,14 @@ import {
   Participant,
   ParticipantStatus,
 } from 'src/modules/datasources/entities/participants.entity';
+import { CronService } from '../cron/cron.service';
 
 @Injectable()
 export class QuizService {
-  constructor(private readonly baseQuizRepository: BaseQuizRepository) {}
+  constructor(
+    private readonly baseQuizRepository: BaseQuizRepository,
+    private readonly cronsService: CronService,
+  ) {}
 
   public async createQuiz(
     payload: CreateQuizReqBodyDTO,
@@ -52,7 +56,7 @@ export class QuizService {
 
     const result = await this.baseQuizRepository.insert(baseQuiz);
 
-    return result.identifiers[0].id;
+    return result.identifiers[0]._id;
   }
 
   //add quiz participant method
@@ -186,6 +190,51 @@ export class QuizService {
       { _id: new ObjectId(quizId) },
       { $push: { participants: newParticipant } },
     );
+  }
+
+  public async participantStartQuiz(
+    quizId: string,
+    jwt: JwtPayloadDTO,
+  ): Promise<void> {
+    const baseQuiz = await this.baseQuizRepository.findOne({
+      where: { _id: new ObjectId(quizId) },
+      select: {
+        status: true,
+        participants: true,
+        creator_id: true,
+      },
+    });
+
+    if (jwt.sub === baseQuiz.creator_id) {
+      await this.forceStartQuiz(baseQuiz);
+    }
+
+    const participantExistance = baseQuiz.participants?.find(
+      (participant) => participant.user_id === jwt.sub,
+    );
+
+    if (!participantExistance)
+      throw new BadRequestException('You are not a participant of this quiz');
+
+    if (participantExistance.status !== ParticipantStatus.NotStarted)
+      throw new BadRequestException('You have already started this quiz');
+
+    if (baseQuiz.status === BaseQuizStatus.NotStarted)
+      throw new BadRequestException('Quiz has not started');
+
+    if (baseQuiz.status === BaseQuizStatus.Done)
+      throw new BadRequestException('Quiz has ended');
+
+    await this.baseQuizRepository.findOneAndUpdate(
+      { _id: new ObjectId(quizId), 'participants.user_id': jwt.sub },
+      { $set: { 'participants.$.status': ParticipantStatus.InProgress } },
+    );
+  }
+
+  private async forceStartQuiz(quiz: BaseQuiz): Promise<void> {
+    await this.cronsService.deleteJob(quiz._id.toHexString());
+
+    // TODO: call start quiz method
   }
 
   private mapCreateQuestionDTOToQuestion(

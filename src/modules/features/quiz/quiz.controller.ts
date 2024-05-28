@@ -128,4 +128,17 @@ export class QuizController {
       message: 'Quiz joined successfully',
     };
   }
+
+  @Post(':quizId/start')
+  @UseGuards(JwtGuard)
+  public async postStartParticipantQuiz(
+    @Param('quizId') quizId: string,
+    @JWT() jwt: JwtPayloadDTO,
+  ): Promise<SuccessResponse<void>> {
+    await this.quizService.participantStartQuiz(quizId, jwt);
+
+    return {
+      message: 'Quiz started successfully',
+    };
+  }
 }

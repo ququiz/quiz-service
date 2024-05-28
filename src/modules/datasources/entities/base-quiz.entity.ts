@@ -11,7 +11,7 @@ export enum BaseQuizStatus {
 @Entity()
 export class BaseQuiz {
   @ObjectIdColumn()
-  id: ObjectId;
+  _id: ObjectId;
 
   @Column()
   name: string;
