@@ -115,4 +115,17 @@ export class QuizController {
       message: 'Quiz deleted successfully',
     };
   }
+
+  @Post(':quizId/join')
+  @UseGuards(JwtGuard)
+  public async postJoinQuiz(
+    @Param('quizId') quizId: string,
+    @JWT() jwt: JwtPayloadDTO,
+  ): Promise<SuccessResponse<string>> {
+    await this.quizService.joinQuiz(quizId, jwt);
+
+    return {
+      message: 'Quiz joined successfully',
+    };
+  }
 }

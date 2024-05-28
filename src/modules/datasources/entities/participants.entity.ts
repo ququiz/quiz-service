@@ -1,5 +1,11 @@
 import { Column, ObjectId, ObjectIdColumn } from 'typeorm';
 
+export enum ParticipantStatus {
+  NotStarted = 'Not Started',
+  InProgress = 'In Progress',
+  Done = 'Done',
+}
+
 export class Participant {
   @ObjectIdColumn()
   id: ObjectId;
@@ -11,5 +17,5 @@ export class Participant {
   final_score: number;
 
   @Column()
-  status: string;
+  status: ParticipantStatus;
 }

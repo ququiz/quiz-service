@@ -18,6 +18,10 @@ import {
 import { Choice } from 'src/modules/datasources/entities/choices.entity';
 import { JwtPayloadDTO } from 'src/modules/commons/auth/dtos/auth.dto';
 import { ObjectId } from 'mongodb';
+import {
+  Participant,
+  ParticipantStatus,
+} from 'src/modules/datasources/entities/participants.entity';
 
 @Injectable()
 export class QuizService {
@@ -73,7 +77,7 @@ export class QuizService {
       id: new ObjectId(),
       user_id: payload.participant_id,
       final_score: 0,
-      status: 'NotStarted',
+      status: ParticipantStatus.NotStarted,
     };
 
     if (!baseQuiz.participants) {
@@ -149,6 +153,39 @@ export class QuizService {
     await this.baseQuizRepository.findOneAndDelete({
       _id: new ObjectId(quizId),
     });
+  }
+
+  public async joinQuiz(quizId: string, jwt: JwtPayloadDTO): Promise<void> {
+    const baseQuiz = await this.baseQuizRepository.findOne({
+      where: { _id: new ObjectId(quizId) },
+      select: {
+        status: true,
+        participants: true,
+      },
+    });
+
+    if (!baseQuiz) throw new BadRequestException('Quiz not found');
+    if (baseQuiz.status === BaseQuizStatus.Done)
+      throw new BadRequestException('Quiz has ended');
+    if (baseQuiz.participants?.length) {
+      const participantExists = baseQuiz.participants.find(
+        (participant) => participant.user_id === jwt.sub,
+      );
+
+      if (participantExists)
+        throw new BadRequestException('You have already joined this quiz');
+    }
+
+    const newParticipant = new Participant();
+
+    newParticipant.id = new ObjectId();
+    newParticipant.user_id = jwt.sub;
+    newParticipant.status = ParticipantStatus.NotStarted;
+
+    await this.baseQuizRepository.findOneAndUpdate(
+      { _id: new ObjectId(quizId) },
+      { $push: { participants: newParticipant } },
+    );
   }
 
   private mapCreateQuestionDTOToQuestion(
