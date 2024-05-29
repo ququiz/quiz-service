@@ -23,5 +23,19 @@ export class Question {
   correct_answer: string;
 
   @Column()
+  user_answer: UserAnswer[];
+
+  @Column()
   weight: number;
+}
+
+export class UserAnswer {
+  @Column()
+  participant_id: string;
+
+  @Column()
+  choice_id: string;
+
+  @Column()
+  answer: string;
 }

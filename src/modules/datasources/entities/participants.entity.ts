@@ -1,9 +1,9 @@
 import { Column, ObjectId, ObjectIdColumn } from 'typeorm';
 
 export enum ParticipantStatus {
-  NotStarted = 'Not Started',
-  InProgress = 'In Progress',
-  Done = 'Done',
+  NotStarted = 'NOT_STARTED',
+  InProgress = 'IN_PROGRESS',
+  Done = 'DONE',
 }
 
 export class Participant {
