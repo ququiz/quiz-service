@@ -11,6 +11,7 @@ async function bootstrap() {
       validateCustomDecorators: true,
     }),
   );
-  await app.listen(3001);
+  app.enableCors();
+  await app.listen(3000);
 }
 bootstrap();
