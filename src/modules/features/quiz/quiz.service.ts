@@ -78,7 +78,7 @@ export class QuizService {
       throw new BadRequestException('Cannot add participant to started quiz');
 
     const newParticipant = {
-      id: new ObjectId(),
+      _id: new ObjectId(),
       user_id: payload.participant_id,
       final_score: 0,
       status: ParticipantStatus.NotStarted,
@@ -182,7 +182,7 @@ export class QuizService {
 
     const newParticipant = new Participant();
 
-    newParticipant.id = new ObjectId();
+    newParticipant._id = new ObjectId();
     newParticipant.user_id = jwt.sub;
     newParticipant.status = ParticipantStatus.NotStarted;
 
@@ -241,6 +241,7 @@ export class QuizService {
     question: CreateQuizQuestionDTO,
   ): Question {
     const newQuestion = new Question();
+    newQuestion._id = new ObjectId();
     newQuestion.question = question.question;
     newQuestion.type = question.type;
     newQuestion.weight = question.weight;
@@ -264,6 +265,7 @@ export class QuizService {
 
   private mapChoiceDTOToChoice(choice: CreateQuizQuestionChoiceDTO): Choice {
     const newChoice = new Choice();
+    newChoice._id = new ObjectId();
     newChoice.text = choice.text;
     newChoice.is_correct = choice.is_correct ?? false;
 

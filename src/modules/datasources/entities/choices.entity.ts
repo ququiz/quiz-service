@@ -2,7 +2,7 @@ import { Column, ObjectId, ObjectIdColumn } from 'typeorm';
 
 export class Choice {
   @ObjectIdColumn()
-  id: ObjectId;
+  _id: ObjectId;
 
   @Column()
   text: string;

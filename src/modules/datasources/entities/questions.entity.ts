@@ -8,7 +8,7 @@ export enum QuestionType {
 
 export class Question {
   @ObjectIdColumn()
-  id: ObjectId;
+  _id: ObjectId;
 
   @Column()
   question: string;

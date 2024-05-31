@@ -8,7 +8,7 @@ export enum ParticipantStatus {
 
 export class Participant {
   @ObjectIdColumn()
-  id: ObjectId;
+  _id: ObjectId;
 
   @Column()
   user_id: string;
