@@ -3,13 +3,12 @@ import { QuizController } from './quiz.controller';
 import { QuizService } from './quiz.service';
 import { DatasourcesModule } from 'src/modules/datasources/datasources.module';
 import { AuthModule } from 'src/modules/commons/auth/auth.module';
-import { CronService } from '../cron/cron.service';
-import { HttpModule } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
+import { CronModule } from 'src/modules/commons/cron/cron.module';
 
 @Module({
-  imports: [DatasourcesModule, AuthModule, HttpModule],
+  imports: [DatasourcesModule, AuthModule, CronModule],
   controllers: [QuizController],
-  providers: [QuizService, CronService, ConfigService],
+  providers: [QuizService, ConfigService],
 })
 export class QuizModule {}

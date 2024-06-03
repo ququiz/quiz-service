@@ -22,8 +22,8 @@ import {
   Participant,
   ParticipantStatus,
 } from 'src/modules/datasources/entities/participants.entity';
-import { CronService } from '../cron/cron.service';
-import { ScheduleTime } from '../cron/dtos/create-schedule.dto';
+import { CronService } from 'src/modules/commons/cron/cron.service';
+import { ScheduleTime } from 'src/modules/commons/cron/dtos/create-schedule.dto';
 
 @Injectable()
 export class QuizService {

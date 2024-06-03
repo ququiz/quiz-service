@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { BaseQuizStatus } from 'src/modules/datasources/entities/base-quiz.entity';
 import { BaseQuizRepository } from 'src/modules/datasources/repositories/base-quiz.repository';
 import { ObjectId } from 'typeorm';
-import { UsersService } from '../users/users.service';
 import { StartQuizReqBodyDTO } from './dtos/start-quiz.dto';
 import { QuizNotifTimeType } from 'src/helpers/enums';
+import { UsersService } from 'src/modules/commons/users/users.service';
+import { ProducerService } from 'src/modules/commons/queue/producer.service';
 import {
   QuizEmailDTO,
   QuizEmailParticipantDTO,
-} from '../queue/dtos/quiz-email.dto';
-import { User } from '../users/interfaces/users.interface';
-import { ProducerService } from '../queue/producer.service';
+} from 'src/modules/commons/queue/dtos/quiz-email.dto';
+import { User } from 'src/modules/commons/users/interfaces/users.interface';
 
 @Injectable()
 export class InternalService {
