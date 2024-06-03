@@ -3,6 +3,9 @@ import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { ConfirmChannel } from 'amqplib';
 import { UserAnswerMQDTO } from './dtos/user-answer.dto';
 import { ConfigService } from '@nestjs/config';
+import { BaseQuizRepository } from 'src/modules/datasources/repositories/base-quiz.repository';
+import { UserAnswer } from 'src/modules/datasources/entities/questions.entity';
+import { ObjectId } from 'typeorm';
 
 @Injectable()
 export class ConsumerService implements OnModuleInit {
@@ -13,7 +16,10 @@ export class ConsumerService implements OnModuleInit {
   private readonly QUEUE_NAME = 'userAnswerQueue';
   private readonly ROUTING_KEY = 'user-answer';
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly baseQuizRepository: BaseQuizRepository,
+  ) {
     const connection = amqp.connect([
       this.configService.get<string>('RABBITMQ_URL'),
     ]);
@@ -41,7 +47,22 @@ export class ConsumerService implements OnModuleInit {
               message.content.toString(),
             ) as UserAnswerMQDTO;
             this.logger.log('Received message:', content);
-            // TODO: input the logic to save the user answer to the database
+
+            const newAnswer = new UserAnswer();
+            newAnswer.choice_id = content.choice_id;
+            newAnswer.answer = content.answer;
+            newAnswer.participant_id = content.participant_id;
+
+            await this.baseQuizRepository.findOneAndUpdate(
+              {
+                _id: new ObjectId(content.quiz_id),
+                'questions._id': new ObjectId(content.question_id),
+              },
+              {
+                $push: { 'questions.$.user_answer': newAnswer },
+              },
+            );
+
             channel.ack(message);
           }
         });
