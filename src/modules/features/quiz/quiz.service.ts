@@ -238,9 +238,12 @@ export class QuizService {
     if (baseQuiz.creator_id !== jwt.sub)
       throw new BadRequestException('You are not the creator of this quiz');
 
-    await this.baseQuizRepository.findOneAndDelete({
-      _id: new ObjectId(quizId),
-    });
+    Promise.all([
+      this.baseQuizRepository.findOneAndDelete({
+        _id: new ObjectId(quizId),
+      }),
+      this.cronsService.deleteAllJobs(quizId),
+    ]);
   }
 
   public async joinQuiz(quizId: string, jwt: JwtPayloadDTO): Promise<void> {

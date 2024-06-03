@@ -18,14 +18,10 @@ import { SuccessResponse } from 'src/helpers/interfaces';
 import { JwtGuard } from 'src/modules/commons/auth/guards/jwt.guard';
 import { JWT } from 'src/modules/commons/auth/decorators/jwt.decorator';
 import { JwtPayloadDTO } from 'src/modules/commons/auth/dtos/auth.dto';
-import { CronService } from '../cron/cron.service';
 
 @Controller('quiz')
 export class QuizController {
-  constructor(
-    private readonly quizService: QuizService,
-    private readonly cronService: CronService,
-  ) {}
+  constructor(private readonly quizService: QuizService) {}
 
   @Post()
   @UseGuards(JwtGuard)
@@ -83,9 +79,6 @@ export class QuizController {
     @JWT() jwt: JwtPayloadDTO,
   ): Promise<SuccessResponse<string>> {
     await this.quizService.deleteQuiz(quizId, jwt);
-
-    //delete cron jobs
-    await this.cronService.deleteJob(quizId);
 
     return {
       message: 'Quiz deleted successfully',
