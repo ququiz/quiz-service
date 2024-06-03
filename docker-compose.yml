@@ -45,3 +45,8 @@ services:
       - ./src:/app/src
     depends_on:
       - mongodb
+    environment:
+      - DKRON_API_URL=http://dkron:9911/v1
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5673
+      - SERVICE_URL=http://quiz:3502
+
