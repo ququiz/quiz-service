@@ -6,12 +6,14 @@ import { throwError } from 'rxjs';
 @Injectable()
 export class CronService {
   private readonly dkronApiUrl: string;
+  private readonly currentHost: string;
 
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
     this.dkronApiUrl = this.configService.get<string>('DKRON_API_URL');
+    this.currentHost = this.configService.get<string>('HOST') || 'localhost';
   }
 
   async listJobs() {
@@ -60,7 +62,7 @@ export class CronService {
   }
 
   async createStartJob(quiz_id: string, schedules: string[]) {
-    const startJobCommand = `curl http://localhost:3001/start-quiz/${quiz_id}`;
+    const startJobCommand = `curl http://${this.currentHost}:3001/start-quiz/${quiz_id}`;
 
     const createJobPromises: Promise<void>[] = [];
 
@@ -83,7 +85,7 @@ export class CronService {
   }
 
   async createEndJob(quiz_id: string, end_time: string) {
-    const endJobCommand = `curl http://localhost:3001/end-quiz/${quiz_id}`;
+    const endJobCommand = `curl http://${this.currentHost}:3001/end-quiz/${quiz_id}`;
     const endJobName = `end_quiz_${quiz_id}`;
     const endJob = {
       name: endJobName,
@@ -96,24 +98,5 @@ export class CronService {
     };
 
     await this.createJob(endJob);
-  }
-
-  private getScheduleForStartJob(start_time: string) {
-    const startDate = new Date(start_time);
-    const oneDay = 24 * 60 * 60 * 1000;
-    const minute30 = 30 * 60 * 1000;
-    const minute1 = 60 * 1000;
-
-    // Calculate schedules for D-1, T-30, and T-1
-    const startSchedule = startDate.toISOString();
-    const day1Schedule = new Date(startDate.getTime() - oneDay).toISOString();
-    const minute30Schedule = new Date(
-      startDate.getTime() - minute30,
-    ).toISOString();
-    const minute1Schedule = new Date(
-      startDate.getTime() - minute1,
-    ).toISOString();
-
-    return [startSchedule, day1Schedule, minute30Schedule, minute1Schedule];
   }
 }
