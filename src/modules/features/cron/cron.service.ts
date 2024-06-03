@@ -35,25 +35,28 @@ export class CronService {
     }
   }
 
-  async deleteJob(quizId: string) {
-    const jobNames = [
-      `start_quiz_${quizId}_0`,
-      `start_quiz_${quizId}_1`,
-      `start_quiz_${quizId}_2`,
-      `start_quiz_${quizId}_3`,
-      `end_quiz_${quizId}`,
-    ];
+  async deleteJob(name: string) {
+    try {
+      await this.httpService
+        .delete(`${this.dkronApiUrl}/jobs/${name}`)
+        .toPromise();
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 
-    jobNames.forEach(async (jobName) => {
-      try {
-        await this.httpService
-          .delete(`${this.dkronApiUrl}/jobs/${jobName}`)
-          .toPromise();
-      } catch (error) {
-        console.error(error);
-        throwError(error);
+  async deleteAllJobs(quiz_id: string) {
+    const jobs = await this.listJobs();
+    const deleteJobPromises: Promise<void>[] = [];
+
+    jobs.forEach((job: any) => {
+      if (job.name.includes(quiz_id)) {
+        deleteJobPromises.push(this.deleteJob(job.name));
       }
     });
+
+    await Promise.all(deleteJobPromises);
   }
 
   async createStartJob(quiz_id: string, schedules: string[]) {

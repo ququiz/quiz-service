@@ -52,19 +52,8 @@ export class QuizController {
     @Body() body: UpdateQuizDTO,
     @JWT() jwt: JwtPayloadDTO,
     @Param('quizId') quizId: string,
-  ): Promise<SuccessResponse<string>> {
+  ): Promise<SuccessResponse<void>> {
     await this.quizService.updateQuiz(quizId, body, jwt);
-
-    //check if start_time is updated
-    if (body.start_time) {
-      //update cron job
-    }
-
-    //check if end_time is updated
-    if (body.end_time) {
-      //update cron job
-      await this.cronService.createEndJob(quizId, body.end_time.toISOString());
-    }
 
     return {
       message: 'Quiz updated successfully',

@@ -164,8 +164,56 @@ export class QuizService {
     const updateFields: Partial<BaseQuiz> = {};
 
     if (payload.title) updateFields.name = payload.title;
-    if (payload.start_time) updateFields.start_time = payload.start_time;
-    if (payload.end_time) updateFields.end_time = payload.end_time;
+    if (payload.start_time) {
+      updateFields.start_time = payload.start_time;
+
+      if (payload.start_time < new Date(Date.now()))
+        throw new BadRequestException('Start time must be in the future');
+
+      const now = Date.now();
+
+      const startTimeDate = payload.start_time.getTime();
+
+      const diff = startTimeDate - now;
+
+      const schedules: string[] = [new Date(startTimeDate).toISOString()];
+
+      const deleteJobPromises: Promise<void>[] = [];
+
+      if (diff > ScheduleTime.ThirtyMinutes) {
+        schedules.push(
+          new Date(startTimeDate - ScheduleTime.ThirtyMinutes).toISOString(),
+        );
+
+        if (diff > ScheduleTime.OneDay)
+          schedules.push(
+            new Date(startTimeDate - ScheduleTime.OneDay).toISOString(),
+          );
+        else
+          deleteJobPromises.push(
+            this.cronsService.deleteJob(`start_quiz_${quizId}_2`),
+          );
+      } else
+        deleteJobPromises.push(
+          this.cronsService.deleteJob(`start_quiz_${quizId}_1`),
+        );
+
+      Promise.all([
+        this.cronsService.createStartJob(quizId, schedules),
+        ...deleteJobPromises,
+      ]);
+    }
+
+    if (payload.end_time) {
+      if (
+        payload.end_time < new Date(Date.now()) ||
+        payload.end_time < baseQuiz.start_time
+      )
+        throw new BadRequestException('End time must be in the future');
+
+      updateFields.end_time = payload.end_time;
+      this.cronsService.createEndJob(quizId, payload.end_time.toISOString());
+    }
 
     if (payload.questions) {
       updateFields.questions = payload.questions.map((question) =>
@@ -268,7 +316,7 @@ export class QuizService {
   }
 
   private async forceStartQuiz(quiz: BaseQuiz): Promise<void> {
-    await this.cronsService.deleteJob(quiz._id.toHexString());
+    await this.cronsService.deleteAllJobs(quiz._id.toHexString());
 
     // TODO: call start quiz method
   }
