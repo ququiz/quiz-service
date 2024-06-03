@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { ConfirmChannel } from 'amqplib';
 import { UserAnswerMQDTO } from './dtos/user-answer.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ConsumerService implements OnModuleInit {
@@ -12,8 +13,10 @@ export class ConsumerService implements OnModuleInit {
   private readonly QUEUE_NAME = 'userAnswerQueue';
   private readonly ROUTING_KEY = 'user-answer';
 
-  constructor() {
-    const connection = amqp.connect(['amqp://localhost']);
+  constructor(private readonly configService: ConfigService) {
+    const connection = amqp.connect([
+      this.configService.get<string>('RABBITMQ_URL'),
+    ]);
     this.channelWrapper = connection.createChannel({
       setup: async (channel: ConfirmChannel) => {
         await channel.assertExchange(this.EXCHANGE_NAME, this.EXCHANGE_TYPE, {

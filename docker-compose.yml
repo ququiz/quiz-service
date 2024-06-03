@@ -18,6 +18,20 @@ services:
     environment:
       - DKRON_BACKEND_MACHINE_URL=dkron://dkron:8946
     restart: always
+  rabbitmq:
+    image: rabbitmq:3.13.1-management
+    container_name: ququiz-rabbitmq
+    deploy:
+      resources:
+        limits:
+          cpus: "0.6"
+          memory: 500mb
+    ports:
+      - 5673:5672
+      - 15673:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
   quiz:
     container_name: "ququiz-quiz"
     build:
