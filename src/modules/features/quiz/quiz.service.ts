@@ -24,12 +24,15 @@ import {
 } from 'src/modules/datasources/entities/participants.entity';
 import { CronService } from 'src/modules/commons/cron/cron.service';
 import { ScheduleTime } from 'src/modules/commons/cron/dtos/create-schedule.dto';
+import { InternalService } from '../internal/internal.service';
+import { QuizNotifTimeType } from 'src/helpers/enums';
 
 @Injectable()
 export class QuizService {
   constructor(
     private readonly baseQuizRepository: BaseQuizRepository,
     private readonly cronsService: CronService,
+    private readonly internalService: InternalService,
   ) {}
 
   public async createQuiz(
@@ -292,7 +295,10 @@ export class QuizService {
       },
     });
 
-    if (jwt.sub === baseQuiz.creator_id) {
+    if (
+      jwt.sub === baseQuiz.creator_id &&
+      baseQuiz.status === BaseQuizStatus.NotStarted
+    ) {
       await this.forceStartQuiz(baseQuiz);
     }
 
@@ -321,7 +327,9 @@ export class QuizService {
   private async forceStartQuiz(quiz: BaseQuiz): Promise<void> {
     await this.cronsService.deleteAllJobs(quiz._id.toHexString());
 
-    // TODO: call start quiz method
+    await this.internalService.startQuiz(quiz._id.toHexString(), {
+      time: QuizNotifTimeType.T1,
+    });
   }
 
   private mapCreateQuestionDTOToQuestion(

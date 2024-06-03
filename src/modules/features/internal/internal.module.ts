@@ -9,5 +9,6 @@ import { QueueModule } from 'src/modules/commons/queue/queue.module';
   imports: [DatasourcesModule, UsersModule, QueueModule],
   controllers: [InternallController],
   providers: [InternalService],
+  exports: [InternalService],
 })
 export class InternalModule {}

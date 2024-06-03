@@ -20,7 +20,10 @@ export class InternalService {
     private readonly producerService: ProducerService,
   ) {}
 
-  public async startQuiz(quizId: string, payload: StartQuizReqBodyDTO) {
+  public async startQuiz(
+    quizId: string,
+    payload: StartQuizReqBodyDTO,
+  ): Promise<void> {
     const quizObjectId = new ObjectId(quizId);
     const baseQuiz = await this.baseQuizRepository.findOne({
       where: { _id: quizObjectId },
