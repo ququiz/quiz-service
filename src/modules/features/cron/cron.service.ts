@@ -6,14 +6,14 @@ import { throwError } from 'rxjs';
 @Injectable()
 export class CronService {
   private readonly dkronApiUrl: string;
-  private readonly currentHost: string;
-
+  private readonly serviceUrl: string;
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
     this.dkronApiUrl = this.configService.get<string>('DKRON_API_URL');
-    this.currentHost = this.configService.get<string>('HOST') || 'localhost';
+    this.serviceUrl =
+      this.configService.get<string>('SERVICE_URL') || 'http://localhost:3000';
   }
 
   async listJobs() {
@@ -62,7 +62,7 @@ export class CronService {
   }
 
   async createStartJob(quiz_id: string, schedules: string[]) {
-    const startJobCommand = `curl http://${this.currentHost}:3001/start-quiz/${quiz_id}`;
+    const startJobCommand = `curl ${this.serviceUrl}/quiz-internal/${quiz_id}/start`;
 
     const createJobPromises: Promise<void>[] = [];
 
@@ -85,7 +85,7 @@ export class CronService {
   }
 
   async createEndJob(quiz_id: string, end_time: string) {
-    const endJobCommand = `curl http://${this.currentHost}:3001/end-quiz/${quiz_id}`;
+    const endJobCommand = `curl ${this.serviceUrl}/quiz-internal/${quiz_id}/stop`;
     const endJobName = `end_quiz_${quiz_id}`;
     const endJob = {
       name: endJobName,
