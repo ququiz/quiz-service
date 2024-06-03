@@ -35,15 +35,6 @@ export class QuizController {
   ): Promise<SuccessResponse<CreateQuizResDTO>> {
     const quizId = await this.quizService.createQuiz(body, jwt);
 
-    //start quiz cron job
-    await this.cronService.createStartJob(
-      quizId,
-      body.start_time.toISOString(),
-    );
-
-    //end quiz cron job
-    await this.cronService.createEndJob(quizId, body.end_time.toISOString());
-
     return {
       message: 'Quiz created successfully',
       data: {
@@ -67,10 +58,6 @@ export class QuizController {
     //check if start_time is updated
     if (body.start_time) {
       //update cron job
-      await this.cronService.createStartJob(
-        quizId,
-        body.start_time.toISOString(),
-      );
     }
 
     //check if end_time is updated

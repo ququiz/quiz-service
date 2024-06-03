@@ -23,6 +23,7 @@ import {
   ParticipantStatus,
 } from 'src/modules/datasources/entities/participants.entity';
 import { CronService } from '../cron/cron.service';
+import { ScheduleTime } from '../cron/dtos/create-schedule.dto';
 
 @Injectable()
 export class QuizService {
@@ -35,23 +36,58 @@ export class QuizService {
     payload: CreateQuizReqBodyDTO,
     jwt: JwtPayloadDTO,
   ): Promise<string> {
+    const { title, start_time, end_time } = payload;
     const baseQuiz = new BaseQuiz();
 
     if (payload.start_time > payload.end_time)
       throw new BadRequestException('Start time must be before end time');
 
-    baseQuiz.name = payload.title;
-    baseQuiz.start_time = payload.start_time;
-    baseQuiz.end_time = payload.end_time;
+    if (payload.end_time < new Date(Date.now()))
+      throw new BadRequestException('End time must be in the future');
+
+    const now = Date.now();
+
+    baseQuiz.name = title;
+    baseQuiz.start_time = start_time;
+    baseQuiz.end_time = end_time;
     baseQuiz.status = BaseQuizStatus.NotStarted;
 
-    if (payload.start_time < new Date())
-      baseQuiz.status = BaseQuizStatus.InProgress;
+    const schedules: string[] = [];
 
+    const startTimeDate = start_time.getTime();
+
+    const diff = startTimeDate - now;
+
+    if (diff > 0) {
+      schedules.push(new Date(startTimeDate).toISOString());
+      if (diff > ScheduleTime.ThirtyMinutes) {
+        schedules.push(
+          new Date(startTimeDate - ScheduleTime.ThirtyMinutes).toISOString(),
+        );
+
+        if (diff > ScheduleTime.OneDay)
+          schedules.push(
+            new Date(startTimeDate - ScheduleTime.OneDay).toISOString(),
+          );
+      }
+    } else baseQuiz.status = BaseQuizStatus.InProgress;
+
+    baseQuiz._id = new ObjectId();
     baseQuiz.passcode = Math.random().toString(36).substring(7);
     baseQuiz.creator_id = jwt.sub;
     baseQuiz.questions = payload.questions.map((question) =>
       this.mapCreateQuestionDTOToQuestion(question),
+    );
+
+    if (schedules.length)
+      await this.cronsService.createStartJob(
+        baseQuiz._id.toHexString(),
+        schedules,
+      );
+
+    await this.cronsService.createEndJob(
+      baseQuiz._id.toHexString(),
+      end_time.toISOString(),
     );
 
     const result = await this.baseQuizRepository.insert(baseQuiz);

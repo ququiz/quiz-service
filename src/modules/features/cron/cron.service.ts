@@ -56,11 +56,12 @@ export class CronService {
     });
   }
 
-  async createStartJob(quiz_id: string, start_time: string) {
-    const schedule = this.getScheduleForStartJob(start_time);
+  async createStartJob(quiz_id: string, schedules: string[]) {
     const startJobCommand = `curl http://localhost:3001/start-quiz/${quiz_id}`;
 
-    schedule.forEach(async (time, index) => {
+    const createJobPromises: Promise<void>[] = [];
+
+    schedules.forEach(async (time, index) => {
       const startJobName = `start_quiz_${quiz_id}_${index}`;
       const startJob = {
         name: startJobName,
@@ -72,8 +73,10 @@ export class CronService {
         },
       };
 
-      await this.createJob(startJob);
+      createJobPromises.push(this.createJob(startJob));
     });
+
+    await Promise.all(createJobPromises);
   }
 
   async createEndJob(quiz_id: string, end_time: string) {
