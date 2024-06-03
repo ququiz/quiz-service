@@ -8,13 +8,18 @@ import { QuizNotifTimeType } from 'src/helpers/enums';
 export class CronService {
   private readonly dkronApiUrl: string;
   private readonly serviceUrl: string;
+  private readonly scoringServiceUrl: string;
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
     this.dkronApiUrl = this.configService.get<string>('DKRON_API_URL');
     this.serviceUrl =
-      this.configService.get<string>('SERVICE_URL') || 'http://localhost:3000';
+      this.configService.get<string>('QUIZ_SERVICE_URL') ||
+      'http://localhost:3000';
+    this.scoringServiceUrl =
+      this.configService.get<string>('SCORING_SERVICE_URL') ||
+      'http://localhost:3504';
   }
 
   async listJobs() {
@@ -92,7 +97,7 @@ export class CronService {
   }
 
   async createEndJob(quiz_id: string, end_time: string) {
-    const endJobCommand = `curl ${this.serviceUrl}/quiz-internal/${quiz_id}/stop`;
+    const endJobCommand = `curl -XPOST ${this.scoringServiceUrl}/scoring-internal/recap/${quiz_id}`;
     const endJobName = `end_quiz_${quiz_id}`;
     const endJob = {
       name: endJobName,
