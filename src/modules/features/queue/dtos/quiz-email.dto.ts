@@ -1,8 +1,4 @@
-export enum QuizEmailTime {
-  D1 = 'D-1',
-  T30 = 'T-30',
-  T1 = 'T-1',
-}
+import { QuizNotifTimeType } from 'src/helpers/enums';
 
 export class QuizEmailParticipantDTO {
   email: string;
@@ -10,12 +6,12 @@ export class QuizEmailParticipantDTO {
 }
 
 export class QuizEmailDTO {
-  time: QuizEmailTime;
+  time: QuizNotifTimeType;
   name: string;
   participants: QuizEmailParticipantDTO[];
 
   constructor(
-    time: QuizEmailTime,
+    time: QuizNotifTimeType,
     name: string,
     participants: QuizEmailParticipantDTO[],
   ) {

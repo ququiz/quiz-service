@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { throwError } from 'rxjs';
+import { QuizNotifTimeType } from 'src/helpers/enums';
 
 @Injectable()
 export class CronService {
@@ -62,7 +63,13 @@ export class CronService {
   }
 
   async createStartJob(quiz_id: string, schedules: string[]) {
-    const startJobCommand = `curl ${this.serviceUrl}/quiz-internal/${quiz_id}/start`;
+    const types = [
+      QuizNotifTimeType.T1,
+      QuizNotifTimeType.T30,
+      QuizNotifTimeType.D1,
+    ];
+
+    const startJobCommand = `curl ${this.serviceUrl}/quiz-internal/${quiz_id}/start -X POST -H "Content-Type: application/json"`;
 
     const createJobPromises: Promise<void>[] = [];
 
@@ -74,7 +81,7 @@ export class CronService {
         owner: 'dkron',
         owner_email: `ququiz@admin.com`,
         run: {
-          cmd: startJobCommand,
+          cmd: startJobCommand + `-d '{"time": "' + ${types[index]} + '"}`,
         },
       };
 
