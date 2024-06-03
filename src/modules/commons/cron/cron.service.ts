@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { throwError } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 import { QuizNotifTimeType } from 'src/helpers/enums';
 
 @Injectable()
@@ -23,31 +23,31 @@ export class CronService {
   }
 
   async listJobs() {
-    const response = await this.httpService
-      .get(`${this.dkronApiUrl}/jobs`)
-      .toPromise();
+    const response = await lastValueFrom(
+      this.httpService.get(`${this.dkronApiUrl}/jobs`),
+    );
     return response.data;
   }
 
   private async createJob(job: any) {
     //dispatch job and catch then console error
     try {
-      const response = await this.httpService
-        .post(`${this.dkronApiUrl}/jobs`, job)
-        .toPromise();
+      const response = await lastValueFrom(
+        this.httpService.post(`${this.dkronApiUrl}/jobs`, job),
+      );
 
       return response.data;
     } catch (error) {
       console.error(error);
-      throwError(error);
+      throw error;
     }
   }
 
   async deleteJob(name: string) {
     try {
-      await this.httpService
-        .delete(`${this.dkronApiUrl}/jobs/${name}`)
-        .toPromise();
+      await lastValueFrom(
+        this.httpService.delete(`${this.dkronApiUrl}/jobs/${name}`),
+      );
     } catch (error) {
       console.error(error);
       throw error;

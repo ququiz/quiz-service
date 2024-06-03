@@ -50,5 +50,5 @@ services:
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5673
       - QUIZ_SERVICE_URL=http://quiz:3502
       - USERS_SERVICE_GRPC_URL=ququiz-authentications:3501
-      - SCORING_SERVICE_URL=http://localhost:3504
+      - SCORING_SERVICE_URL=http://ququiz-scoring-service:3504
 
