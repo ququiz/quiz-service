@@ -16,6 +16,8 @@ WORKDIR /app
 
 COPY package*.json ./
 
+COPY protos ./protos
+
 RUN npm install --only=production
 
 COPY --from=build /app/dist ./dist
