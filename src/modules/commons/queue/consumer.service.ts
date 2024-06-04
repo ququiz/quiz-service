@@ -28,7 +28,7 @@ export class ConsumerService implements OnModuleInit {
         await channel.assertExchange(this.EXCHANGE_NAME, this.EXCHANGE_TYPE, {
           durable: true,
         });
-        await channel.assertQueue(this.QUEUE_NAME, { durable: true });
+        // await channel.assertQueue(this.QUEUE_NAME, { durable: true });
         await channel.bindQueue(
           this.QUEUE_NAME,
           this.EXCHANGE_NAME,
@@ -41,7 +41,7 @@ export class ConsumerService implements OnModuleInit {
   public async onModuleInit() {
     try {
       await this.channelWrapper.addSetup(async (channel: ConfirmChannel) => {
-        await channel.assertQueue(this.QUEUE_NAME, { durable: true });
+        // await channel.assertQueue(this.QUEUE_NAME, { durable: true });
         await channel.consume(this.QUEUE_NAME, async (message) => {
           if (message) {
             const content = JSON.parse(
