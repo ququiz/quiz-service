@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BaseQuizStatus } from 'src/modules/datasources/entities/base-quiz.entity';
 import { BaseQuizRepository } from 'src/modules/datasources/repositories/base-quiz.repository';
-import { ObjectId } from 'typeorm';
+import { ObjectId } from 'mongodb';
 import { StartQuizReqBodyDTO } from './dtos/start-quiz.dto';
 import { QuizNotifTimeType } from 'src/helpers/enums';
 import { UsersService } from 'src/modules/commons/users/users.service';
@@ -34,19 +34,21 @@ export class InternalService {
       },
     });
 
-    const participantUserIds = baseQuiz.participants.map(
-      (participant) => participant.user_id,
-    );
+    if (baseQuiz.participants?.length) {
+      const participantUserIds = baseQuiz.participants.map(
+        (participant) => participant.user_id,
+      );
 
-    const gRPCRes = await this.usersService.getUserByIds(participantUserIds);
+      const gRPCRes = await this.usersService.getUserByIds(participantUserIds);
 
-    const messageQueueReq = new QuizEmailDTO(
-      payload.time,
-      baseQuiz.name,
-      gRPCRes.user.map(this.mapUserToEmailParticipant),
-    );
+      const messageQueueReq = new QuizEmailDTO(
+        payload.time,
+        baseQuiz.name,
+        gRPCRes.user.map(this.mapUserToEmailParticipant),
+      );
 
-    await this.producerService.sendQuizEmailMessage(messageQueueReq);
+      await this.producerService.sendQuizEmailMessage(messageQueueReq);
+    }
 
     if (payload.time === QuizNotifTimeType.T1)
       await this.baseQuizRepository.findOneAndUpdate(
