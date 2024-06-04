@@ -44,10 +44,10 @@ export class ConsumerService implements OnModuleInit {
         // await channel.assertQueue(this.QUEUE_NAME, { durable: true });
         await channel.consume(this.QUEUE_NAME, async (message) => {
           if (message) {
+            this.logger.log('Received message:', message);
             const content = JSON.parse(
               message.content.toString(),
             ) as UserAnswerMQDTO;
-            this.logger.log('Received message:', content);
 
             const newAnswer = new UserAnswer();
             newAnswer.choice_id = content.choice_id;
