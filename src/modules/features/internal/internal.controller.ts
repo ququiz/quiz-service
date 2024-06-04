@@ -4,7 +4,7 @@ import { SuccessResponse } from 'src/helpers/interfaces';
 import { StartQuizReqBodyDTO } from './dtos/start-quiz.dto';
 
 @Controller('quiz-internal')
-export class InternallController {
+export class InternalController {
   constructor(private readonly internalService: InternalService) {}
 
   @Post(':quizId/start')
