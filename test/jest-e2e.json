@@ -1,9 +1,13 @@
 {
-  "rootDir": "./",
-   "modulePaths": [
-     "<rootDir>"
-   ],
   "moduleFileExtensions": ["js", "json", "ts"],
+  "moduleDirectories": ["common", "node_modules"],
+  "moduleNameMapper": {
+    "\\.(css|scss)$": "identity-obj-proxy"
+  },
+  "modulePaths": ["<rootDir>"],
+  "collectCoverageFrom": ["**/*.(t|j)s"],
+  "coverageDirectory": "../coverage",
+  "rootDir": "../",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
