@@ -41,6 +41,7 @@ export class ConsumerService implements OnModuleInit {
   public async onModuleInit() {
     try {
       await this.channelWrapper.addSetup(async (channel: ConfirmChannel) => {
+        await channel.assertQueue(this.QUEUE_NAME, { durable: true });
         await channel.consume(this.QUEUE_NAME, async (message) => {
           if (message) {
             const content = JSON.parse(
