@@ -51,4 +51,5 @@ services:
       - QUIZ_SERVICE_URL=http://quiz:3502
       - USERS_SERVICE_GRPC_URL=ququiz-authentications:3501
       - SCORING_SERVICE_URL=http://ququiz-scoring-service:3504
+      - MONGO_URL=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@localhost:27017
 
