@@ -18,10 +18,7 @@ const repositories = [BaseQuizRepository];
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'mongodb',
-        username: configService.get('MONGO_USERNAME'),
-        password: configService.get('MONGO_PASSWORD'),
-        host: configService.get('MONGO_HOST'),
-        port: configService.get('MONGO_PORT'),
+        url: configService.get('MONGO_URL'),
         synchronize: true,
         entities: [BaseQuiz, Choice, Participant, Question, UserAnswer],
       }),
