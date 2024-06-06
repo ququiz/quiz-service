@@ -5,7 +5,7 @@ import { UserAnswerMQDTO } from './dtos/user-answer.dto';
 import { ConfigService } from '@nestjs/config';
 import { BaseQuizRepository } from 'src/modules/datasources/repositories/base-quiz.repository';
 import { UserAnswer } from 'src/modules/datasources/entities/questions.entity';
-import { ObjectId } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class ConsumerService implements OnModuleInit {
