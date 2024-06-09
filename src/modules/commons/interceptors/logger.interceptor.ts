@@ -14,6 +14,11 @@ export class LoggerInterceptor implements NestInterceptor {
   public intercept(context: ExecutionContext, next: CallHandler) {
     const httpContext = context.switchToHttp();
     const request = httpContext.getRequest();
+    // skip logging for health check endpoint
+    if (request.url === '/healthz') {
+      return next.handle();
+    }
+
     this.loggerService.log(`START_REQUEST: ${request.method} ${request.url}`, {
       headers: request.headers,
       body: request.body,
