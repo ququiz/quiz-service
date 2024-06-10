@@ -3,7 +3,7 @@ curl -XPOST --location 'http://dkron-svc:8080/v1/jobs' \
 --data '{
   "name": "distributed system job test",
   "displayname": "test doang",
-  "schedule": "@every 5s",
+  "schedule": "@at 2024-06-10T20:30:00+07:00",
   "timezone": "Asia/Jakarta",
   "owner": "quiz-command-service",
   "owner_email": "ququiz@gmail.com",
@@ -11,6 +11,7 @@ curl -XPOST --location 'http://dkron-svc:8080/v1/jobs' \
   "concurrency": "allow",
   "executor": "shell",
   "executor_config": {
-    "command": "curl -XPOST --location  scoring-service:3504/scoring-internal/recap/6665c194a03d529a494ce28d --header \"Content-Type: application/json\" " 
+    "command": "curl -XPOST --location  scoring-service:3504/scoring-internal/recap/6666ff8b9d07b42865df9024 --header \"Content-Type: application/json\" " 
   }
 }'
+

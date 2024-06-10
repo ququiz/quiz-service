@@ -1,0 +1,14 @@
+{
+  "name": "distributedsystemjobtest",
+  "displayname": "test doang",
+  "schedule": "@at 2024-06-10T20:30:00+07:00",
+  "timezone": "Asia/Jakarta",
+  "owner": "quiz-command-service",
+  "owner_email": "ququiz@gmail.com",
+  "disabled": false,
+  "concurrency": "allow",
+  "executor": "shell",
+  "executor_config": {
+    "command": "curl -XPOST --location  scoring-service:3504/scoring-internal/recap/6666ff8b9d07b42865df9024 --header \"Content-Type: application/json\" "
+  }
+}
