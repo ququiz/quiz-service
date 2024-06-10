@@ -89,7 +89,7 @@ export class CronService {
       const startJob = {
         name: startJobName,
         schedule: `@at ${time}`,
-        timezone: 'Asia/Jakarta',
+        // time zone dihapus aja bikin gak work di k8s
         displayname: `Start Quiz Scheduler ${quiz_id} for Time: ${types[index]}`,
         owner: 'dkron',
         owner_email: `ququiz@admin.com`,
@@ -119,7 +119,7 @@ export class CronService {
     const endJob = {
       name: endJobName,
       schedule: `@at ${end_time}`,
-      timezone: 'Asia/Jakarta',
+      // time zone dihapus aja bikin gak work di k8s
       displayname: `End Quiz ${quiz_id}`,
       owner: 'dkron',
       owner_email: `ququiz@admin.com`,
