@@ -14,5 +14,5 @@ export interface GetUserRequestById {
 }
 
 export interface GetUserResponseByIds {
-  user: User[];
+  users: User[];
 }

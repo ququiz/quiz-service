@@ -44,7 +44,7 @@ export class InternalService {
       const messageQueueReq = new QuizEmailDTO(
         payload.time,
         baseQuiz.name,
-        gRPCRes.user.map(this.mapUserToEmailParticipant),
+        gRPCRes.users.map(this.mapUserToEmailParticipant),
       );
 
       await this.producerService.sendQuizEmailMessage(messageQueueReq);
