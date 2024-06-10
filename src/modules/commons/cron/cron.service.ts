@@ -83,10 +83,15 @@ export class CronService {
       const startJob = {
         name: startJobName,
         schedule: `@at ${time}`,
+        timezone: 'Asia/Jakarta',
+        displayname: `Start Quiz Scheduler ${quiz_id} for Time: ${types[index]}`,
         owner: 'dkron',
         owner_email: `ququiz@admin.com`,
-        run: {
-          cmd: startJobCommand + `-d '{"time": "' + ${types[index]} + '"}`,
+        disabled: false,
+        concurrency: 'allow',
+        executor: 'shell',
+        executor_config: {
+          command: startJobCommand + `-d '{"time": "' + ${types[index]} + '"}`,
         },
       };
 
@@ -102,10 +107,15 @@ export class CronService {
     const endJob = {
       name: endJobName,
       schedule: `@at ${end_time}`,
+      timezone: 'Asia/Jakarta',
+      displayname: `End Quiz ${quiz_id}`,
       owner: 'dkron',
       owner_email: `ququiz@admin.com`,
-      run: {
-        cmd: endJobCommand,
+      disabled: false,
+      concurrency: 'allow',
+      executor: 'shell',
+      executor_config: {
+        command: endJobCommand,
       },
     };
 
