@@ -12,7 +12,7 @@ export class ConsumerService implements OnModuleInit {
   private channelWrapper: ChannelWrapper;
   private readonly logger = new Logger(ConsumerService.name);
   private readonly EXCHANGE_NAME = 'quiz-command-quiz-query';
-  private readonly EXCHANGE_TYPE = 'topic';
+  private readonly EXCHANGE_TYPE = 'direct';
   private readonly QUEUE_NAME = 'userAnswerQueue';
   private readonly ROUTING_KEY = 'user-answer';
 
