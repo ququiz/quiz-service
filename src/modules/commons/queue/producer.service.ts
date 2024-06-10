@@ -45,4 +45,8 @@ export class ProducerService {
       console.error('Failed to send message:', err);
     }
   }
+
+  async closeConnection() {
+    await this.channelWrapper.close();
+  }
 }

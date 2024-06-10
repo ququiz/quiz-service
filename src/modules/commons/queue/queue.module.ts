@@ -7,6 +7,6 @@ import { DatasourcesModule } from 'src/modules/datasources/datasources.module';
 @Module({
   imports: [DatasourcesModule],
   providers: [ConfigService, ProducerService, ConsumerService],
-  exports: [ProducerService],
+  exports: [ProducerService, ConsumerService],
 })
 export class QueueModule {}

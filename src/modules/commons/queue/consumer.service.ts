@@ -44,12 +44,14 @@ export class ConsumerService implements OnModuleInit {
         // await channel.assertQueue(this.QUEUE_NAME, { durable: true });
         await channel.consume(this.QUEUE_NAME, async (message) => {
           if (message) {
-            console.log("content: " +  message.content.toString())
+            console.log('content: ' + message.content.toString());
 
             const content = JSON.parse(
-              message.content.toString()
+              message.content.toString(),
             ) as UserAnswerMQDTO;
-            console.log("content after json parse: " +  message.content.toString())
+            console.log(
+              'content after json parse: ' + message.content.toString(),
+            );
             const newAnswer = new UserAnswer();
             newAnswer.choice_id = content.choice_id;
             newAnswer.answer = content.answer;
@@ -73,5 +75,9 @@ export class ConsumerService implements OnModuleInit {
     } catch (err) {
       this.logger.error('Error starting the consumer:', err);
     }
+  }
+
+  public async closeConnection() {
+    await this.channelWrapper.close();
   }
 }
