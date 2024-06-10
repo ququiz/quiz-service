@@ -91,7 +91,7 @@ export class CronService {
         concurrency: 'allow',
         executor: 'shell',
         executor_config: {
-          command: startJobCommand + `-d '{"time": "' + ${types[index]} + '"}`,
+          command: startJobCommand + ` -d '{"time":  "${types[index]}"}'`,
         },
       };
 
