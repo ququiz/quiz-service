@@ -9,10 +9,13 @@ export class CronService {
   private readonly dkronApiUrl: string;
   private readonly serviceUrl: string;
   private readonly scoringServiceUrl: string;
+  private readonly isUtc: boolean;
+
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
+    this.isUtc = this.configService.get<boolean>('IS_UTC') || true;
     this.dkronApiUrl = this.configService.get<string>('DKRON_API_URL');
     this.serviceUrl =
       this.configService.get<string>('QUIZ_SERVICE_URL') ||
@@ -80,6 +83,9 @@ export class CronService {
 
     schedules.forEach(async (time, index) => {
       const startJobName = `start_quiz_${quiz_id}_${index}`;
+      time = this.isUtc
+        ? new Date(new Date(time).getTime() + 7 * 60 * 60 * 1000).toISOString()
+        : time;
       const startJob = {
         name: startJobName,
         schedule: `@at ${time}`,
@@ -104,6 +110,12 @@ export class CronService {
   async createEndJob(quiz_id: string, end_time: string) {
     const endJobCommand = `curl -XPOST ${this.scoringServiceUrl}/scoring-internal/recap/${quiz_id}`;
     const endJobName = `end_quiz_${quiz_id}`;
+    end_time = this.isUtc
+      ? new Date(
+          new Date(end_time).getTime() + 7 * 60 * 60 * 1000,
+        ).toISOString()
+      : end_time;
+
     const endJob = {
       name: endJobName,
       schedule: `@at ${end_time}`,
