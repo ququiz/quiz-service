@@ -1,0 +1,16 @@
+curl -XPOST --location 'http://dkron-svc:8080/v1/jobs' \
+--header 'Content-Type: application/json' \
+--data '{
+  "name": "distributed system job test",
+  "displayname": "test doang",
+  "schedule": "@every 5s",
+  "timezone": "Asia/Jakarta",
+  "owner": "quiz-command-service",
+  "owner_email": "ququiz@gmail.com",
+  "disabled": false,
+  "concurrency": "allow",
+  "executor": "shell",
+  "executor_config": {
+    "command": "curl -XPOST --location  scoring-service:3504/scoring-internal/recap/6665c194a03d529a494ce28d --header \"Content-Type: application/json\" " 
+  }
+}'
